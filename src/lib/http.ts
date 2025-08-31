@@ -7,13 +7,7 @@ export type FetchOptions = {
 };
 
 export async function fetchWithRetry(url: string, opts: FetchOptions = {}) {
-  const {
-    method = 'GET',
-    headers = {},
-    body = null,
-    timeoutMs = 15_000,
-    retry = 2,
-  } = opts;
+  const { method = 'GET', headers = {}, body = null, timeoutMs = 15_000, retry = 2 } = opts;
 
   for (let attempt = 0; attempt <= retry; attempt++) {
     const controller = new AbortController();

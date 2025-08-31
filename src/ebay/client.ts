@@ -15,7 +15,10 @@ export class EbayClient {
   private async authHeader(scopes?: string[]) {
     // Prefer user token when a refresh token is configured (needed for many Sell APIs)
     if (env.EBAY_REFRESH_TOKEN) {
-      const scopesToUse = scopes && scopes.length ? scopes : (env.EBAY_USER_SCOPES?.split(' ').filter(Boolean) ?? SELL_ALL_SCOPES);
+      const scopesToUse =
+        scopes && scopes.length
+          ? scopes
+          : (env.EBAY_USER_SCOPES?.split(' ').filter(Boolean) ?? SELL_ALL_SCOPES);
       const user = await this.tokenManager.refreshUserToken(env.EBAY_REFRESH_TOKEN, scopesToUse);
       return { Authorization: `Bearer ${user.token}` };
     }

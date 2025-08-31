@@ -1,4 +1,11 @@
 import { z } from 'zod';
+import dotenvFlow from 'dotenv-flow';
+
+// Load .env, .env.local, and environment-specific files automatically
+dotenvFlow.config({
+  // Allow .env.local for local overrides; do not error if missing
+  silent: true,
+});
 
 const EnvSchema = z.object({
   NODE_ENV: z.enum(['development', 'test', 'production']).default('development'),
@@ -11,15 +18,28 @@ const EnvSchema = z.object({
   // Space-separated scopes for application (client credentials) token if needed
   EBAY_APP_SCOPES: z.string().optional(),
   // Space-separated scopes for user access token (authorization code/refresh)
-  EBAY_USER_SCOPES: z
-    .string()
-    .optional()
-    .describe('Space-separated eBay Sell API scopes'),
+  EBAY_USER_SCOPES: z.string().optional().describe('Space-separated eBay Sell API scopes'),
   // Optional pre-obtained refresh token for seller account
   EBAY_REFRESH_TOKEN: z.string().optional(),
 });
 
-const parsed = EnvSchema.safeParse(process.env);
+// Helper to collapse whitespace/newlines in scope strings
+function normalizeScopes(value?: string) {
+  if (!value) return undefined;
+  return value
+    .split(/[\s\n\r]+/)
+    .filter(Boolean)
+    .join(' ');
+}
+
+// Normalize scope strings before validation
+const normalized = {
+  ...process.env,
+  EBAY_APP_SCOPES: normalizeScopes(process.env.EBAY_APP_SCOPES),
+  EBAY_USER_SCOPES: normalizeScopes(process.env.EBAY_USER_SCOPES),
+};
+
+const parsed = EnvSchema.safeParse(normalized);
 if (!parsed.success) {
   const msg = parsed.error.issues.map((i) => `${i.path.join('.')}: ${i.message}`).join('\n');
   // Fail fast with clear message

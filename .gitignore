@@ -1,6 +1,15 @@
+# Dependencies and build
 node_modules
 dist
-.env
-.env.*.local
-.DS_Store
 coverage
+.DS_Store
+
+# Dotenv files (keep example checked in)
+.env
+.env.local
+.env.*.local
+.env.development
+.env.production
+.env.test
+.env.staging
+!.env.example

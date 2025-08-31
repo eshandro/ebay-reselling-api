@@ -4,7 +4,7 @@ A lightweight API that proxies eBay endpoints with proper OAuth, starting with S
 
 ## Quick start
 
-1) Ensure Node 24+
+1. Ensure Node 24+
 
 Using fnm (recommended):
 
@@ -15,17 +15,17 @@ fnm install 24
 fnm use 24
 ```
 
-2) Install deps
+2. Install deps
 
 ```bash
 pnpm install
 ```
 
-3) Configure env
+3. Configure env
 
 Copy `.env.example` to `.env` and fill values.
 
-4) Run dev server
+4. Run dev server
 
 ```bash
 pnpm dev
@@ -41,10 +41,12 @@ Visit http://localhost:3002/docs for Swagger UI.
 - EBAY_RUNAME: eBay Redirect URI name (for user auth in future)
 
 Notes on eBay OAuth:
+
 - Application token (client credentials) is fetched from `/identity/v1/oauth2/token` using Basic auth and scopes.
 - Many Sell APIs require a user access token tied to a seller account. For that, you’ll need a RUName (Redirect URI name configured in the eBay Dev Portal; it must match the callback you use) and implement the authorization code + refresh flow.
 
 ## Scripts
+
 - `pnpm dev` – run with live reload (tsx)
 - `pnpm build` – bundle with tsup
 - `pnpm start` – run built server
@@ -52,8 +54,10 @@ Notes on eBay OAuth:
 - `pnpm lint` – eslint
 
 ## Deploy
+
 - Local: Node 20+, port 3002
 - AWS: package with tsup; use @fastify/aws-lambda adapter or run in a container
 
 ## License
+
 TBD
