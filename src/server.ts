@@ -8,45 +8,52 @@ import { env } from './config/env.js';
 const __dirname = fileURLToPath(new URL('.', import.meta.url));
 const port = Number(env.PORT ?? '3002');
 
-const server = Fastify({
-  logger: {
-    transport: {
-      target: 'pino-pretty',
-      options: {
-        translateTime: 'HH:MM:ss Z',
-        ignore: 'pid,hostname',
+// Build and configure the Fastify server as a Factory for testing purposes
+export async function buildServer() {
+  const server = Fastify({
+    logger: {
+      transport: {
+        target: 'pino-pretty',
+        options: {
+          translateTime: 'HH:MM:ss Z',
+          ignore: 'pid,hostname',
+        },
       },
+      level: env.LOG_LEVEL ?? 'info',
     },
-    level: env.LOG_LEVEL ?? 'info',
-  },
-  disableRequestLogging: true,
-});
+    disableRequestLogging: true,
+  });
 
-// Add Zod Validation Support
-server.setValidatorCompiler(validatorCompiler);
-server.setSerializerCompiler(serializerCompiler);
+  // Add Zod Validation Support
+  server.setValidatorCompiler(validatorCompiler);
+  server.setSerializerCompiler(serializerCompiler);
 
-// Register Plugins - loaded first and are available to all routes
-await server.register(Autoload, {
-  dir: join(__dirname, 'plugins'),
-  encapsulate: false, // Makes plugins available globally
-});
+  // Register Plugins - loaded first and are available to all routes
+  await server.register(Autoload, {
+    dir: join(__dirname, 'plugins'),
+    encapsulate: false, // Makes plugins available globally
+  });
 
-// Register Routes, e.g src/routes/auth.ts -> /auth
-await server.register(Autoload, {
-  dir: join(__dirname, 'routes'),
-  options: { prefix: '/' },
-});
+  // Register Routes, e.g src/routes/auth.ts -> /auth
+  await server.register(Autoload, {
+    dir: join(__dirname, 'routes'),
+    options: { prefix: '/' },
+  });
 
-try {
-  await server.ready();
-  await server.listen({ port, host: '0.0.0.0' });
-  server.log.info(
-    `Server listening at http://localhost:${port}; docs at http://localhost:${port}/docs`,
-  );
-} catch (err) {
-  server.log.error(err);
-  process.exit(1);
+  return server;
 }
 
-export { server };
+if (import.meta.url === `file://${process.argv[1]}`) {
+  // If server.ts is run directly, start the server
+  const server = await buildServer();
+  try {
+    await server.ready();
+    await server.listen({ port, host: '0.0.0.0' });
+    server.log.info(
+      `Server listening at http://localhost:${port}; docs at http://localhost:${port}/docs`,
+    );
+  } catch (err) {
+    server.log.error(err);
+    process.exit(1);
+  }
+}

@@ -8,5 +8,7 @@ export default defineConfig({
       provider: 'v8',
       reporter: ['text', 'html'],
     },
+    pool: 'forks',
+    execArgv: ['--import', 'tsx'], // Use tsx for TS support with ESM
   },
 });
