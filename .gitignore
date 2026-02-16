@@ -13,3 +13,4 @@ coverage
 .env.test
 .env.staging
 !.env.example
+!.env.test.example

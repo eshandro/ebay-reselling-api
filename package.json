@@ -12,6 +12,7 @@
     "start": "node dist/server.js",
     "lint": "eslint .",
     "lint:fix": "eslint . --fix",
+    "pretest": "node ./scripts/pretest-env.js",
     "test": "vitest run",
     "test:watch": "vitest",
     "prepare": "husky"

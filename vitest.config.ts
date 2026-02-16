@@ -1,3 +1,7 @@
+// Ensure .env.test exists before Vitest runs
+import { checkTestEnv } from './scripts/check-test-env.js';
+checkTestEnv();
+
 import { defineConfig } from 'vitest/config';
 
 export default defineConfig({
