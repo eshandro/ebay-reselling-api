@@ -56,4 +56,14 @@ if (import.meta.url === `file://${process.argv[1]}`) {
     server.log.error(err);
     process.exit(1);
   }
+
+  // Graceful shutdown handlers
+  const shutdown = async (signal: string) => {
+    server.log.info(`${signal} received, closing server gracefully`);
+    await server.close();
+    process.exit(0);
+  };
+
+  process.on('SIGTERM', () => shutdown('SIGTERM'));
+  process.on('SIGINT', () => shutdown('SIGINT'));
 }
