@@ -10,6 +10,7 @@ dotenvFlow.config({
 const EnvSchema = z.object({
   NODE_ENV: z.enum(['development', 'test', 'production']).default('development'),
   PORT: z.string().default('3002'),
+  LOG_LEVEL: z.enum(['fatal', 'error', 'warn', 'info', 'debug', 'trace']).default('info'),
   EBAY_ENV: z.enum(['sandbox', 'production']).default('sandbox'),
   EBAY_CLIENT_ID: z.string().min(1, 'EBAY_CLIENT_ID is required'),
   EBAY_CLIENT_SECRET: z.string().min(1, 'EBAY_CLIENT_SECRET is required'),
