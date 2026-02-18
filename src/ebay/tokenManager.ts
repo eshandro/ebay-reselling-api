@@ -1,6 +1,6 @@
-import { env } from '../config/env.js';
-import { EBAY_AUTH_TOKEN_URL, type EbayEnv } from './constants.js';
-import { fetchWithRetry } from '../lib/http.js';
+import { env } from '@config/env.js';
+import { EBAY_AUTH_TOKEN_URL, type EbayEnv } from '@ebay/constants.js';
+import { fetchWithRetry } from '@lib/http.js';
 
 type TokenResponse = {
   access_token: string;

@@ -12,7 +12,16 @@
     "resolveJsonModule": true,
     "verbatimModuleSyntax": true,
     "outDir": "dist",
-    "rootDir": "src"
+    "rootDir": "src",
+    "paths": {
+      "@config/*": ["./src/config/*"],
+      "@ebay/*": ["./src/ebay/*"],
+      "@lib/*": ["./src/lib/*"],
+      "@plugins/*": ["./src/plugins/*"],
+      "@routes/*": ["./src/routes/*"],
+      "@schemas/*": ["./src/schemas/*"],
+      "@types/*": ["./src/types/*"]
+    }
   },
   "include": ["src"],
   "exclude": ["node_modules", "dist"]

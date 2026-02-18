@@ -1,7 +1,7 @@
-import { env } from '../config/env.js';
-import { EBAY_SELL_ENDPOINTS, SELL_ALL_SCOPES, type EbayEnv } from './constants.js';
-import { EbayTokenManager } from './tokenManager.js';
-import { fetchWithRetry } from '../lib/http.js';
+import { env } from '@config/env.js';
+import { EBAY_SELL_ENDPOINTS, SELL_ALL_SCOPES, type EbayEnv } from '@ebay/constants.js';
+import { EbayTokenManager } from '@ebay/tokenManager.js';
+import { fetchWithRetry } from '@lib/http.js';
 
 export class EbayClient {
   private readonly env: EbayEnv;

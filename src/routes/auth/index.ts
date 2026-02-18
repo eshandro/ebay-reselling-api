@@ -1,13 +1,13 @@
 import type { FastifyPluginAsync } from 'fastify';
-import { env } from '../../config/env.js';
-import { SELL_ALL_SCOPES, EBAY_AUTH_AUTHORIZE_URL } from '../../ebay/constants.js';
-import { EbayTokenManager } from '../../ebay/tokenManager.js';
+import { env } from '@config/env.js';
+import { SELL_ALL_SCOPES, EBAY_AUTH_AUTHORIZE_URL } from '@ebay/constants.js';
+import { EbayTokenManager } from '@ebay/tokenManager.js';
 import {
   appTokenResponse,
   authorizeUrlResponse,
   callbackBody,
   callbackResponse,
-} from '../../schemas/authSchemas.js';
+} from '@schemas/authSchemas.js';
 
 const authRoutes: FastifyPluginAsync = async (fastify) => {
   fastify.get(

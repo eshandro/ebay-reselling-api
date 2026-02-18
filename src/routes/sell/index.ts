@@ -1,5 +1,5 @@
 import type { FastifyPluginAsync, FastifyRequest } from 'fastify';
-import { listOrdersQuery, getInventoryParams } from '../../schemas/sellSchemas.js';
+import { listOrdersQuery, getInventoryParams } from '@schemas/sellSchemas.js';
 
 const sellRoutes: FastifyPluginAsync = async (fastify) => {
   fastify.get(

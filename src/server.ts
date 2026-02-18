@@ -3,7 +3,7 @@ import { fileURLToPath } from 'node:url';
 import Autoload from '@fastify/autoload';
 import Fastify from 'fastify';
 import { serializerCompiler, validatorCompiler } from 'fastify-type-provider-zod';
-import { env } from './config/env.js';
+import { env } from '@config/env.js';
 
 const __dirname = fileURLToPath(new URL('.', import.meta.url));
 const port = Number(env.PORT ?? '3002');
