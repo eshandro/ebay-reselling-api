@@ -1,6 +1,9 @@
 import { env } from '@config/env.js';
 import { EBAY_AUTH_TOKEN_URL, type EbayEnv } from '@ebay/constants.js';
 import { fetchWithRetry } from '@lib/http.js';
+import { createLogger } from '@lib/logger.js';
+
+const log = createLogger('tokenManager');
 
 type TokenResponse = {
   access_token: string;
@@ -36,6 +39,7 @@ export class EbayTokenManager {
 
   async getApplicationToken(scopes?: string[]) {
     if (!this.appToken || this.willExpire(this.appToken.expiresAt)) {
+      log.info({ env: this.env }, 'fetching new application token');
       const body = new URLSearchParams();
       body.set('grant_type', 'client_credentials');
       if (scopes && scopes.length) body.set('scope', scopes.join(' '));
@@ -50,6 +54,7 @@ export class EbayTokenManager {
       });
       if (!res.ok) {
         const txt = await res.text();
+        log.error({ status: res.status, env: this.env }, 'failed to fetch application token');
         throw new Error(`Failed to fetch app token: ${res.status} ${txt}`);
       }
       const json = (await res.json()) as TokenResponse;
@@ -57,12 +62,16 @@ export class EbayTokenManager {
         token: json.access_token,
         expiresAt: this.now() + (json.expires_in ?? 3600),
       };
+      log.debug({ expiresIn: json.expires_in }, 'application token cached');
+    } else {
+      log.debug('returning cached application token');
     }
     return this.appToken.token;
   }
 
   // Authorization Code exchange (for future Sell user flows)
   async exchangeCodeForUserToken(code: string, redirectUri: string, scopes?: string[]) {
+    log.info({ env: this.env }, 'exchanging authorization code for user token');
     const body = new URLSearchParams();
     body.set('grant_type', 'authorization_code');
     body.set('code', code);
@@ -79,6 +88,7 @@ export class EbayTokenManager {
     });
     if (!res.ok) {
       const txt = await res.text();
+      log.error({ status: res.status, env: this.env }, 'failed to exchange authorization code');
       throw new Error(`Failed to exchange auth code: ${res.status} ${txt}`);
     }
     const json = (await res.json()) as TokenResponse;
@@ -87,10 +97,12 @@ export class EbayTokenManager {
       expiresAt: this.now() + (json.expires_in ?? 3600),
       refreshToken: json.refresh_token,
     };
+    log.info({ hasRefreshToken: !!json.refresh_token }, 'user token obtained');
     return this.userToken;
   }
 
   async refreshUserToken(refreshToken: string, scopes?: string[]) {
+    log.info({ env: this.env }, 'refreshing user token');
     const body = new URLSearchParams();
     body.set('grant_type', 'refresh_token');
     body.set('refresh_token', refreshToken);
@@ -106,6 +118,7 @@ export class EbayTokenManager {
     });
     if (!res.ok) {
       const txt = await res.text();
+      log.error({ status: res.status, env: this.env }, 'failed to refresh user token');
       throw new Error(`Failed to refresh user token: ${res.status} ${txt}`);
     }
     const json = (await res.json()) as TokenResponse;
@@ -114,6 +127,7 @@ export class EbayTokenManager {
       expiresAt: this.now() + (json.expires_in ?? 3600),
       refreshToken,
     };
+    log.debug({ expiresIn: json.expires_in }, 'user token refreshed and cached');
     return this.userToken;
   }
 }

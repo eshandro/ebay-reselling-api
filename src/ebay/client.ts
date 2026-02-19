@@ -2,6 +2,9 @@ import { env } from '@config/env.js';
 import { EBAY_SELL_ENDPOINTS, SELL_ALL_SCOPES, type EbayEnv } from '@ebay/constants.js';
 import { EbayTokenManager } from '@ebay/tokenManager.js';
 import { fetchWithRetry } from '@lib/http.js';
+import { createLogger } from '@lib/logger.js';
+
+const log = createLogger('ebayClient');
 
 export class EbayClient {
   private readonly env: EbayEnv;
@@ -28,6 +31,7 @@ export class EbayClient {
 
   // Orders list (Sell Fulfillment). Note: some Sell API operations require user tokens.
   async listOrders(params: { limit?: number; offset?: number; orderIds?: string[] }) {
+    log.info({ params }, 'listing eBay orders');
     const base = EBAY_SELL_ENDPOINTS(this.env).orders;
     const sp = new URLSearchParams();
     if (params.limit) sp.set('limit', String(params.limit));
@@ -43,13 +47,16 @@ export class EbayClient {
     });
     if (!res.ok) {
       const txt = await res.text();
+      log.error({ status: res.status }, 'eBay orders request failed');
       throw new Error(`eBay orders error: ${res.status} ${txt}`);
     }
+    log.debug('eBay orders fetched successfully');
     return (await res.json()) as unknown;
   }
 
   // Inventory items
   async getInventoryItem(sku: string) {
+    log.info({ sku }, 'fetching eBay inventory item');
     const base = EBAY_SELL_ENDPOINTS(this.env).inventoryItems;
     const url = `${base}/${encodeURIComponent(sku)}`;
     const res = await fetchWithRetry(url, {
@@ -60,8 +67,10 @@ export class EbayClient {
     });
     if (!res.ok) {
       const txt = await res.text();
+      log.error({ status: res.status, sku }, 'eBay inventory request failed');
       throw new Error(`eBay inventory error: ${res.status} ${txt}`);
     }
+    log.debug({ sku }, 'eBay inventory item fetched successfully');
     return (await res.json()) as unknown;
   }
 }

@@ -4,6 +4,7 @@ import Autoload from '@fastify/autoload';
 import Fastify from 'fastify';
 import { serializerCompiler, validatorCompiler } from 'fastify-type-provider-zod';
 import { env } from '@config/env.js';
+import { logger } from '@lib/logger.js';
 
 const __dirname = fileURLToPath(new URL('.', import.meta.url));
 const port = Number(env.PORT ?? '3002');
@@ -11,16 +12,10 @@ const port = Number(env.PORT ?? '3002');
 // Build and configure the Fastify server as a Factory for testing purposes
 export async function buildServer() {
   const server = Fastify({
-    logger: {
-      transport: {
-        target: 'pino-pretty',
-        options: {
-          translateTime: 'HH:MM:ss Z',
-          ignore: 'pid,hostname',
-        },
-      },
-      level: env.LOG_LEVEL ?? 'info',
-    },
+    loggerInstance: logger,
+    // Built-in request logging is disabled in favour of the custom
+    // requestLogger plugin (src/plugins/requestLogger.ts), which gives
+    // us status-code-aware log levels and route-level suppression.
     disableRequestLogging: true,
   });
 
