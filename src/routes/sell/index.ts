@@ -1,7 +1,7 @@
-import type { FastifyPluginAsync, FastifyRequest } from 'fastify';
+import type { FastifyPluginAsyncZod } from 'fastify-type-provider-zod';
 import { listOrdersQuery, getInventoryParams } from '@schemas/sellSchemas.js';
 
-const sellRoutes: FastifyPluginAsync = async (fastify) => {
+const sellRoutes: FastifyPluginAsyncZod = async (fastify) => {
   fastify.get(
     '/orders',
     {
@@ -10,7 +10,7 @@ const sellRoutes: FastifyPluginAsync = async (fastify) => {
         querystring: listOrdersQuery,
       },
     },
-    async (req: FastifyRequest<{ Querystring: { limit?: number; offset?: number } }>) => {
+    async (req) => {
       const data = await fastify.ebay.listOrders({
         limit: req.query.limit,
         offset: req.query.offset,
@@ -27,7 +27,7 @@ const sellRoutes: FastifyPluginAsync = async (fastify) => {
         params: getInventoryParams,
       },
     },
-    async (req: FastifyRequest<{ Params: { sku: string } }>) => {
+    async (req) => {
       const data = await fastify.ebay.getInventoryItem(req.params.sku);
       return data;
     },

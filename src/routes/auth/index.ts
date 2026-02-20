@@ -1,4 +1,4 @@
-import type { FastifyPluginAsync } from 'fastify';
+import type { FastifyPluginAsyncZod } from 'fastify-type-provider-zod';
 import { env } from '@config/env.js';
 import { SELL_ALL_SCOPES, EBAY_AUTH_AUTHORIZE_URL } from '@ebay/constants.js';
 import { EbayTokenManager } from '@ebay/tokenManager.js';
@@ -9,7 +9,7 @@ import {
   callbackResponse,
 } from '@schemas/authSchemas.js';
 
-const authRoutes: FastifyPluginAsync = async (fastify) => {
+const authRoutes: FastifyPluginAsyncZod = async (fastify) => {
   fastify.get(
     '/app-token',
     {
@@ -58,7 +58,7 @@ const authRoutes: FastifyPluginAsync = async (fastify) => {
       },
     },
     async (req) => {
-      const { code, redirectUri } = req.body as { code: string; redirectUri: string };
+      const { code, redirectUri } = req.body;
       const tm = new EbayTokenManager(env.EBAY_ENV);
       const scopes = env.EBAY_USER_SCOPES?.split(' ').filter(Boolean) ?? SELL_ALL_SCOPES;
       const t = await tm.exchangeCodeForUserToken(code, redirectUri, scopes);

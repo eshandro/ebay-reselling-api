@@ -1,38 +1,26 @@
+import { z } from 'zod';
+
 export const authorizeUrlResponse = {
-  200: {
-    type: 'object',
-    properties: { url: { type: 'string', format: 'uri' } },
-    required: ['url'],
-  },
-} as const;
+  200: z.object({
+    url: z.url(),
+  }),
+};
 
 export const appTokenResponse = {
-  200: {
-    type: 'object',
-    properties: {
-      tokenPreview: { type: 'string' },
-      expiresInHintSec: { type: 'number' },
-    },
-    required: ['tokenPreview', 'expiresInHintSec'],
-  },
-} as const;
+  200: z.object({
+    tokenPreview: z.string(),
+    expiresInHintSec: z.number(),
+  }),
+};
 
-export const callbackBody = {
-  type: 'object',
-  properties: {
-    code: { type: 'string', minLength: 1 },
-    redirectUri: { type: 'string', minLength: 1 },
-  },
-  required: ['code', 'redirectUri'],
-} as const;
+export const callbackBody = z.object({
+  code: z.string().min(1),
+  redirectUri: z.string().min(1),
+});
 
 export const callbackResponse = {
-  200: {
-    type: 'object',
-    properties: {
-      accessTokenPreview: { type: 'string' },
-      hasRefreshToken: { type: 'boolean' },
-    },
-    required: ['accessTokenPreview', 'hasRefreshToken'],
-  },
-} as const;
+  200: z.object({
+    accessTokenPreview: z.string(),
+    hasRefreshToken: z.boolean(),
+  }),
+};
