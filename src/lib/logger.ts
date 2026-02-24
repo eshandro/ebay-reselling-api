@@ -20,7 +20,7 @@ export const logger = pino(
     ? pino.transport({
         target: 'pino-pretty',
         options: {
-          translateTime: 'HH:MM:ss Z',
+          translateTime: 'yyyy-mm-dd HH:MM:ss Z',
           ignore: 'pid,hostname',
         },
       })

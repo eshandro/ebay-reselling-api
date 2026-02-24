@@ -16,7 +16,8 @@ type TokenResponse = {
 
 export class EbayTokenManager {
   private appToken?: { token: string; expiresAt: number };
-  private userToken?: { token: string; expiresAt: number; refreshToken?: string };
+  // Keyed by the refresh-token value so each seller gets its own cache entry
+  private readonly userTokenCache = new Map<string, { token: string; expiresAt: number }>();
   private readonly env: EbayEnv;
 
   constructor(ebayEnv: EbayEnv = env.EBAY_ENV) {
@@ -92,16 +93,22 @@ export class EbayTokenManager {
       throw new Error(`Failed to exchange auth code: ${res.status} ${txt}`);
     }
     const json = (await res.json()) as TokenResponse;
-    this.userToken = {
-      token: json.access_token,
-      expiresAt: this.now() + (json.expires_in ?? 3600),
-      refreshToken: json.refresh_token,
-    };
+    const entry = { token: json.access_token, expiresAt: this.now() + (json.expires_in ?? 3600) };
+    // Cache under the refresh token key so subsequent refreshes hit the in-memory cache
+    if (json.refresh_token) {
+      this.userTokenCache.set(json.refresh_token, entry);
+    }
     log.info({ hasRefreshToken: !!json.refresh_token }, 'user token obtained');
-    return this.userToken;
+    return { token: entry.token, expiresAt: entry.expiresAt, refreshToken: json.refresh_token };
   }
 
   async refreshUserToken(refreshToken: string, scopes?: string[]) {
+    const cached = this.userTokenCache.get(refreshToken);
+    if (cached && !this.willExpire(cached.expiresAt)) {
+      log.debug('returning cached user token');
+      return { token: cached.token, expiresAt: cached.expiresAt, refreshToken };
+    }
+
     log.info({ env: this.env }, 'refreshing user token');
     const body = new URLSearchParams();
     body.set('grant_type', 'refresh_token');
@@ -122,12 +129,9 @@ export class EbayTokenManager {
       throw new Error(`Failed to refresh user token: ${res.status} ${txt}`);
     }
     const json = (await res.json()) as TokenResponse;
-    this.userToken = {
-      token: json.access_token,
-      expiresAt: this.now() + (json.expires_in ?? 3600),
-      refreshToken,
-    };
+    const entry = { token: json.access_token, expiresAt: this.now() + (json.expires_in ?? 3600) };
+    this.userTokenCache.set(refreshToken, entry);
     log.debug({ expiresIn: json.expires_in }, 'user token refreshed and cached');
-    return this.userToken;
+    return { token: entry.token, expiresAt: entry.expiresAt, refreshToken };
   }
 }

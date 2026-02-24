@@ -6,7 +6,10 @@ export const EBAY_BASE = {
 } as const;
 
 export const EBAY_AUTH_TOKEN_URL = (env: EbayEnv) => `${EBAY_BASE[env]}/identity/v1/oauth2/token`;
-export const EBAY_AUTH_AUTHORIZE_URL = 'https://auth.ebay.com/oauth2/authorize';
+export const EBAY_AUTH_AUTHORIZE_URL = (ebayEnv: EbayEnv) =>
+  ebayEnv === 'sandbox'
+    ? 'https://auth.sandbox.ebay.com/oauth2/authorize'
+    : 'https://auth.ebay.com/oauth2/authorize';
 
 // Common scopes
 export const SCOPE_BASE = 'https://api.ebay.com/oauth/api_scope';
@@ -34,8 +37,7 @@ export const SELL_ALL_SCOPES = [
   // Marketing
   `${SCOPE_BASE}/sell.marketing`,
   `${SCOPE_BASE}/sell.marketing.readonly`,
-  // Analytics
-  `${SCOPE_BASE}/sell.analytics`,
+  // Analytics (readonly only — sell.analytics write scope is not assigned by default)
   `${SCOPE_BASE}/sell.analytics.readonly`,
 ];
 

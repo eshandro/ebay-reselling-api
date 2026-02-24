@@ -22,12 +22,17 @@ const EnvSchema = z.object({
   EBAY_USER_SCOPES: z.string().optional().describe('Space-separated eBay Sell API scopes'),
   // Optional pre-obtained refresh token for seller account
   EBAY_REFRESH_TOKEN: z.string().optional(),
+  // Path to the local JSON file used to persist seller refresh tokens
+  TOKENS_FILE: z.string().optional(),
+  // Optional ngrok domain for local development redirects
+  NGROK_DOMAIN: z.string().optional(),
 });
 
 // Helper to collapse whitespace/newlines in scope strings
 function normalizeScopes(value?: string) {
   if (!value) return undefined;
   return value
+    .replace(/\\/g, '') // strip backslash line-continuation characters
     .split(/[\s\n\r]+/)
     .filter(Boolean)
     .join(' ');

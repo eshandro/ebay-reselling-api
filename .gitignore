@@ -14,3 +14,6 @@ coverage
 .env.staging
 !.env.example
 !.env.test.example
+
+# Local seller token store (contains sensitive refresh tokens)
+.tokens.json
